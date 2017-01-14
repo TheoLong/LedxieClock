@@ -1,9 +1,12 @@
 #include <Arduino.h>
 
-void setup() {
-
+void setup()
+{
+	Serial.begin(115200);
 }
 
-void loop() {
-
+void loop()
+{
+	Serial.println("123");
+	delay(1200);
 }
