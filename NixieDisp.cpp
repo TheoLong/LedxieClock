@@ -59,6 +59,7 @@ void NixieDisp::randomLine(int tShuffle, int tLast)
 	tStart = millis();
 	unsigned long tEnd = tStart + tShuffle;
 	int randomNum;
+	//shuffle for time
 	while (millis() <= tEnd)
 	{
 		for (int i = 0; i < tubeNum; i++)
@@ -73,9 +74,43 @@ void NixieDisp::randomLine(int tShuffle, int tLast)
 		updateTubes_NIXIE();
 
 	}
-	setTube(7, 1);
+	//fix decimal dot
 	setTube(6, 10);
 	updateTubes_NIXIE();
+	//generate random stop number
+	int list[tubeNum] = {0,1,2,3,4,5,-1,7};
+	for (int a=0; a<tubeNum; a++)
+	{
+	 int r = random(tubeNum);
+	 int temp = list[a];
+	 list[a] = list[r];
+	 list[r] = temp;
+	}
+	//stop according to random order
+
+	for(int i = 0; i < tubeNum; i ++)
+		{
+			tStart = millis();
+			tEnd = tStart + 200;
+			while(millis() <= tEnd)
+			{
+				//mark stop shuffle
+				list[i] = -1;
+				for (int j = 0; j < tubeNum; j++)
+				{
+					if(list[j] >= 0)
+					{
+						randomNum = random(10);
+										while (tubes[i].curNum == randomNum)
+										{
+											randomNum = random(10);
+										}
+										setTube(list[j], randomNum);
+					}
+				}
+				updateTubes_NIXIE();
+			}
+		}
 //	for(int j = dim; j < 255; j ++)
 //	{
 ////		for (int i = 0; i < tubeNum; i++)
@@ -119,14 +154,17 @@ void NixieDisp::updateTubes_NIXIE()
 	//turn on new numbers
 	for (int i = 0; i < tubeNum; i++)
 	{
-		//if(tubes[i].curNum < 11)
-		pixels.setPixelColor(LED[tubes[i].curNum] + (11 * i), pixels.Color(255, 55, 0));
+		if(tubes[i].curNum < 11)
+		{
+			pixels.setPixelColor(LED[tubes[i].curNum] + (11 * i), pixels.Color(255, 55, 0));
+		}
 	}
 	pixels.show();
-  	delay(5);
+	delay(5);
 	//turn off old numbers
 	for (int i = 0; i < tubeNum; i++)
 	{
+		if(tubes[i].preNum != tubes[i].curNum)
 		pixels.setPixelColor(LED[tubes[i].preNum] + (11 * i), pixels.Color(0, 0, 0));
 
 	}
@@ -152,4 +190,23 @@ String NixieDisp::getCurrent() const
 		output = output + " | " + String(thisNum);
 	}
 	return output;
+}
+
+void NixieDisp::timmer()
+{
+
+
+	TimerOne Timer1;
+	Timer1.initialize(1000000);
+
+
+	while (true)
+	{
+
+	}
+}
+
+void NixieDisp::updateTime()
+{
+
 }
